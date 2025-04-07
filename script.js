@@ -195,7 +195,10 @@ function renderizarProdutos(lista = produtos) {
         <option value="">Selecione</option>
         ${opcoesTamanho}
       </select>
-      <button data-index="${index}" class="add-to-cart mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-all duration-300 active:scale-95">
+      <button class="add-to-cart mt-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-all duration-300 active:scale-95"
+  data-nome="${prod.nome}"
+  data-preco="${prod.preco}"
+  data-imagem="${prod.imagem}">
         Adicionar ao carrinho
       </button>
     `;
@@ -205,43 +208,51 @@ function renderizarProdutos(lista = produtos) {
 
   const buttons = container.querySelectorAll(".add-to-cart");
   buttons.forEach(button => {
-    button.addEventListener("click", () => adicionarAoCarrinhoComTamanho(button));
+  button.addEventListener("click", () => {
+    const card = button.closest(".bg-white");
+    const select = card.querySelector(".tamanho-select");
+    const tamanho = select.value;
+
+    if (!tamanho) {
+      alert("Selecione um tamanho antes de adicionar ao carrinho.");
+      return;
+    }
+
+    const produtoSelecionado = {
+      nome: button.dataset.nome,
+      preco: button.dataset.preco,
+      imagem: button.dataset.imagem,
+      tamanho,
+      quantidade: 1
+    };
+
+    adicionarAoCarrinho(produtoSelecionado);
+
+    button.textContent = "Adicionado!";
+    button.classList.add("bg-green-600");
+    setTimeout(() => {
+      button.textContent = "Adicionar ao carrinho";
+      button.classList.remove("bg-green-600");
+    }, 1000);
   });
+});
 }
 
-function adicionarAoCarrinhoComTamanho(button) {
-  const index = parseInt(button.getAttribute("data-index"));
-  const card = button.closest(".bg-white");
-  const select = card.querySelector(".tamanho-select");
-  const tamanho = select.value;
-
-  if (!tamanho) {
-    alert("Selecione um tamanho antes de adicionar ao carrinho.");
-    return;
-  }
-
-  const produtoSelecionado = { ...produtos[index], tamanho };
+function adicionarAoCarrinho(produto) {
   const carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 
-  // Verifica se já existe produto igual (nome + tamanho)
-  const existente = carrinho.find(p => p.nome === produtoSelecionado.nome && p.tamanho === produtoSelecionado.tamanho);
+  const existente = carrinho.find(
+    p => p.nome === produto.nome && p.tamanho === produto.tamanho
+  );
 
   if (existente) {
     existente.quantidade = (existente.quantidade || 1) + 1;
   } else {
-    produtoSelecionado.quantidade = 1;
-    carrinho.push(produtoSelecionado);
+    carrinho.push(produto);
   }
 
   localStorage.setItem("carrinho", JSON.stringify(carrinho));
   atualizarContador();
-
-  button.textContent = "Adicionado!";
-  button.classList.add("bg-green-600");
-  setTimeout(() => {
-    button.textContent = "Adicionar ao carrinho";
-    button.classList.remove("bg-green-600");
-  }, 1000);
 }
 
 function atualizarContador() {
