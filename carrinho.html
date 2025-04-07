@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carrinho - DAMATHI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Conteúdo principal da página -->
+  <main class="container mx-auto px-4 pt-24">
+
+    <!-- Título -->
+    <header class="text-center mb-6">
+      <h1 class="text-2xl font-bold">Seu Carrinho</h1>
+    </header>
+
+    <!-- Lista de produtos no carrinho -->
+    <section id="carrinhoList" class="space-y-4 mb-6">
+      <!-- Os itens serão inseridos via JavaScript -->
+    </section>
+
+    <!-- Resumo do total e botão de finalização -->
+    <aside id="resumo" class="bg-white p-4 rounded shadow text-right hidden space-y-4">
+      <p class="text-lg font-semibold">Total: R$ <span id="total">0,00</span></p>
+      
+      <a href="formulario.html" id="finalizar"
+         class="inline-block px-6 py-2 rounded text-white transition-all
+                bg-green-600 hover:bg-green-700
+                disabled:opacity-50 pointer-events-none">
+        Finalizar Pedido
+      </a>
+    
+      <a href="index.html"
+         class="inline-block bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 transition">
+        ← Continuar comprando
+      </a>
+    </aside>
+
+    <!-- Mensagem de sucesso -->
+    <section id="mensagem" class="text-center text-green-600 font-medium mt-6 hidden">
+      Pedido realizado com sucesso! 🎉
+
+      <!-- Voltar à home -->
+      <div class="text-center mt-6">
+        <a href="index.html" class="inline-block bg-gray-800 text-white px-6 py-3 rounded hover:bg-gray-700 transition">
+          ← Continuar comprando
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    // Dados do carrinho
+    let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+
+    const lista = document.getElementById("carrinhoList");
+    const totalSpan = document.getElementById("total");
+    const resumoBox = document.getElementById("resumo");
+    const mensagem = document.getElementById("mensagem");
+    const finalizarBtn = document.getElementById("finalizar");
+
+    // Renderiza os produtos do carrinho
+    function renderizarCarrinho() {
+      lista.innerHTML = "";
+
+      if (carrinho.length === 0) {
+  lista.innerHTML = `
+    <div class="text-center text-gray-600">
+      <p class="text-lg mb-4">Seu carrinho está vazio.</p>
+      <a href="index.html" class="inline-block bg-gray-800 text-white px-6 py-3 rounded hover:bg-gray-700 transition">
+        ← Continuar comprando
+      </a>
+    </div>
+  `;
+  resumoBox.classList.add("hidden");
+  return;
+}
+
+      let total = 0;
+
+      carrinho.forEach((item, index) => {
+        const precoNum = parseFloat(item.preco.replace(",", "."));
+        const quantidade = item.quantidade || 1;
+        total += precoNum * quantidade;
+
+        const div = document.createElement("article");
+        div.id = `item-${index}`;
+        div.className = "bg-white p-4 rounded shadow flex items-center justify-between transition-all duration-500 opacity-100";
+
+        div.innerHTML = `
+          <div class="flex items-center space-x-4">
+            <img src="${item.imagem}" alt="${item.nome}" class="w-20 h-20 object-cover rounded">
+            <div>
+              <h3 class="text-lg font-semibold">${item.nome}</h3>
+              <p class="text-gray-800">R$ ${item.preco}</p>
+              <p class="text-sm text-gray-400">Tamanho: ${item.tamanho?.toUpperCase() || "-"}</p>
+              <div class="flex items-center space-x-2 mt-1">
+                <button onclick="diminuirQtd(${index})" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">-</button>
+                <span class="text-sm font-medium">${quantidade}</span>
+                <button onclick="aumentarQtd(${index})" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">+</button>
+              </div>
+            </div>
+          </div>
+          <button onclick="removerItemComAnimacao(${index})" class="text-red-600 hover:underline">Remover</button>
+        `;
+
+        lista.appendChild(div);
+      });
+
+      totalSpan.textContent = total.toFixed(2).replace(".", ",");
+      resumoBox.classList.remove("hidden");
+
+      finalizarBtn.classList.toggle("pointer-events-none", carrinho.length === 0);
+      finalizarBtn.classList.toggle("opacity-50", carrinho.length === 0);
+    }
+
+    // Aumenta a quantidade de um item
+    function aumentarQtd(index) {
+      carrinho[index].quantidade = (carrinho[index].quantidade || 1) + 1;
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+      renderizarCarrinho();
+    }
+
+    // Diminui a quantidade ou remove o item se for 1
+    function diminuirQtd(index) {
+      if (carrinho[index].quantidade > 1) {
+        carrinho[index].quantidade -= 1;
+      } else {
+        carrinho.splice(index, 1);
+      }
+      localStorage.setItem("carrinho", JSON.stringify(carrinho));
+      renderizarCarrinho();
+    }
+
+    // Remove item com animação
+    function removerItemComAnimacao(index) {
+      const divItem = document.getElementById(`item-${index}`);
+      if (!divItem) return;
+
+      divItem.classList.add("opacity-0", "-translate-x-4");
+
+      setTimeout(() => {
+        carrinho.splice(index, 1);
+        localStorage.setItem("carrinho", JSON.stringify(carrinho));
+        renderizarCarrinho();
+      }, 400);
+    }
+
+    // Inicializa a renderização ao carregar a página
+    renderizarCarrinho();
+  </script>
+
+</body>
+</html>
