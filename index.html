@@ -2,156 +2,155 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Carrinho - DAMATHI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAMATHI</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="stilo.css">
+  <!-- Para os ícones sociais -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
 
-  <!-- Conteúdo principal da página -->
-  <main class="container mx-auto px-4 pt-24">
+  <!-- Cabeçalho principal -->
+  <header class="bg-black text-white fixed top-0 left-0 w-full z-50 shadow-md">
+    <div class="w-full flex justify-between items-center px-6 py-4 border-b border-gray-700">
 
-    <!-- Título -->
-    <header class="text-center mb-6">
-      <h1 class="text-2xl font-bold">Seu Carrinho</h1>
-    </header>
+      <!-- Logotipo -->
+      <div class="text-3xl font-black tracking-widest">DAMATHI</div>
 
-    <!-- Lista de produtos no carrinho -->
-    <section id="carrinhoList" class="space-y-4 mb-6">
-      <!-- Os itens serão inseridos via JavaScript -->
-    </section>
+      <!-- Navegação principal -->
+      <nav class="hidden md:flex space-x-6 text-lg font-high" id="menuDesktop">
+        <button onclick="filtrarPorTipo('camisetax')" class="hover:text-gray-300">Camisetas</button>
+        <button onclick="filtrarPorTipo('blusax')" class="hover:text-gray-300">Blusas</button>
+        <button onclick="filtrarPorTipo('bermudax')" class="hover:text-gray-300">Bermudas</button>
+        <button onclick="mostrarTodosProdutos()" class="text-red-500 hover:text-gray-300">Todos</button>
+      </nav>
 
-    <!-- Resumo do total e botão de finalização -->
-    <aside id="resumo" class="bg-white p-4 rounded shadow text-right hidden space-y-4">
-      <p class="text-lg font-semibold">Total: R$ <span id="total">0,00</span></p>
-      
-      <a href="formulario.html" id="finalizar"
-         class="inline-block px-6 py-2 rounded text-white transition-all
-                bg-green-600 hover:bg-green-700
-                disabled:opacity-50 pointer-events-none">
-        Finalizar Pedido
-      </a>
-    
-      <a href="index.html"
-         class="inline-block bg-gray-800 text-white px-6 py-2 rounded hover:bg-gray-700 transition">
-        ← Continuar comprando
-      </a>
-    </aside>
+      <!-- Menu mobile toggle -->
+      <button id="menuToggle" class="md:hidden text-white focus:outline-none">☰</button>
 
-    <!-- Mensagem de sucesso -->
-    <section id="mensagem" class="text-center text-green-600 font-medium mt-6 hidden">
-      Pedido realizado com sucesso! 🎉
+      <!-- Informacoes do usuário e carrinho -->
+      <div class="flex items-center space-x-6">
+        <!-- Info do Usuário preenchida via JS -->
+        <div id="usuarioInfo" class="flex items-center space-x-2 text-sm"></div>
 
-      <!-- Voltar à home -->
-      <div class="text-center mt-6">
-        <a href="index.html" class="inline-block bg-gray-800 text-white px-6 py-3 rounded hover:bg-gray-700 transition">
-          ← Continuar comprando
+        <!-- Link para carrinho -->
+        <a href="carrinho.html" class="relative flex items-center">
+          <svg class="w-6 h-6 hover:text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-1 2h13" />
+          </svg>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+            0
+          </span>
         </a>
       </div>
+    </div>
+
+    <!-- Menu mobile -->
+    <nav id="menuMobile" class="hidden flex-col space-y-2 mt-4 md:hidden text-sm font-medium text-white px-6">
+      <button onclick="filtrarPorTipo('camisetas')" class="hover:text-gray-300">Camisetas</button>
+      <button onclick="filtrarPorTipo('blusas')" class="hover:text-gray-300">Blusas</button>
+      <button onclick="filtrarPorTipo('bermudas')" class="hover:text-gray-300">Bermudas</button>
+      <button onclick="renderizarProdutos()" class="text-red-500 hover:text-gray-300">Todos</button>
+    </nav>
+  </header>
+
+  <!-- Conteúdo principal -->
+  <main class="w-full px-4 pt-24">
+
+    <!-- Navegação Breadcrumb -->
+    <nav class="text-sm text-gray-400 mt-6 mb-4 ml-6 flex items-center space-x-2">
+      <a href="index.html" class="hover:text-black">Home</a>
+      <span>/</span>
+      <span id="breadcrumbCategoria" class="text-gray-800 font-semibold">Camisetas</span>
+    </nav>
+
+    <!-- Filtros -->
+    <section class="ml-6">
+      <button id="filterToggle" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+        Filtrar produtos
+      </button>
+
+      <div id="filterPanel" class="mt-4 space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Tipo de peça</label>
+          <select id="filterTipo" class="border border-gray-300 rounded px-3 py-2 w-full max-w-xs">
+            <option value="">Todos</option>
+            <option value="camisetas">Camisetas</option>
+            <option value="bermudas">Bermudas</option>
+            <option value="blusas">Blusas</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Tamanho</label>
+          <select id="filterTamanho" class="border border-gray-300 rounded px-3 py-2 w-full max-w-xs">
+            <option value="">Todos</option>
+            <option value="pp">PP</option>
+            <option value="p">P</option>
+            <option value="m">M</option>
+            <option value="g">G</option>
+            <option value="gg">GG</option>
+          </select>
+        </div>
+        <div>
+          <button id="clearFilters" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">
+            Limpar Filtros
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Título da seção de produtos -->
+    <h2 id="tituloCategoria" class="text-center text-2xl font-semibold text-gray-800 my-6">
+      Produtos
+    </h2>
+
+    <!-- Lista de produtos -->
+    <section id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4 px-4">
+      <!-- Produtos renderizados via JS -->
     </section>
 
   </main>
 
+  
+
   <!-- Scripts -->
+  <script src="script.js"></script>
   <script>
-    // Dados do carrinho
-    let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+    document.addEventListener("DOMContentLoaded", () => {
+      const usuarioInfo = document.getElementById("usuarioInfo");
+      const usuario = JSON.parse(localStorage.getItem("usuarioLogado"));
 
-    const lista = document.getElementById("carrinhoList");
-    const totalSpan = document.getElementById("total");
-    const resumoBox = document.getElementById("resumo");
-    const mensagem = document.getElementById("mensagem");
-    const finalizarBtn = document.getElementById("finalizar");
-
-    // Renderiza os produtos do carrinho
-    function renderizarCarrinho() {
-      lista.innerHTML = "";
-
-      if (carrinho.length === 0) {
-  lista.innerHTML = 
-    <div class="text-center text-gray-600">
-      <p class="text-lg mb-4">Seu carrinho está vazio.</p>
-      <a href="index.html" class="inline-block bg-gray-800 text-white px-6 py-3 rounded hover:bg-gray-700 transition">
-        ← Continuar comprando
-      </a>
-    </div>
-  ;
-  resumoBox.classList.add("hidden");
-  return;
-}
-
-      let total = 0;
-
-      carrinho.forEach((item, index) => {
-        const precoNum = parseFloat(item.preco.replace(",", "."));
-        const quantidade = item.quantidade || 1;
-        total += precoNum * quantidade;
-
-        const div = document.createElement("article");
-        div.id = item-${index};
-        div.className = "bg-white p-4 rounded shadow flex items-center justify-between transition-all duration-500 opacity-100";
-
-        div.innerHTML = 
-          <div class="flex items-center space-x-4">
-            <img src="${item.imagem}" alt="${item.nome}" class="w-20 h-20 object-cover rounded">
-            <div>
-              <h3 class="text-lg font-semibold">${item.nome}</h3>
-              <p class="text-gray-800">R$ ${item.preco}</p>
-              <p class="text-sm text-gray-400">Tamanho: ${item.tamanho?.toUpperCase() || "-"}</p>
-              <div class="flex items-center space-x-2 mt-1">
-                <button onclick="diminuirQtd(${index})" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">-</button>
-                <span class="text-sm font-medium">${quantidade}</span>
-                <button onclick="aumentarQtd(${index})" class="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">+</button>
-              </div>
-            </div>
-          </div>
-          <button onclick="removerItemComAnimacao(${index})" class="text-red-600 hover:underline">Remover</button>
-        ;
-
-        lista.appendChild(div);
-      });
-
-      totalSpan.textContent = total.toFixed(2).replace(".", ",");
-      resumoBox.classList.remove("hidden");
-
-      finalizarBtn.classList.toggle("pointer-events-none", carrinho.length === 0);
-      finalizarBtn.classList.toggle("opacity-50", carrinho.length === 0);
-    }
-
-    // Aumenta a quantidade de um item
-    function aumentarQtd(index) {
-      carrinho[index].quantidade = (carrinho[index].quantidade || 1) + 1;
-      localStorage.setItem("carrinho", JSON.stringify(carrinho));
-      renderizarCarrinho();
-    }
-
-    // Diminui a quantidade ou remove o item se for 1
-    function diminuirQtd(index) {
-      if (carrinho[index].quantidade > 1) {
-        carrinho[index].quantidade -= 1;
+      if (usuario) {
+        usuarioInfo.innerHTML = `
+          <span class="text-white hidden sm:inline">Olá, ${usuario.email.split('@')[0]}</span>
+          <button id="logoutBtn" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-500 text-xs">Sair</button>
+        `;
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioLogado");
+          location.reload();
+        });
       } else {
-        carrinho.splice(index, 1);
+        usuarioInfo.innerHTML = `
+          <a href="login.html" class="hover:text-gray-400 flex items-center gap-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M5.121 17.804A10.97 10.97 0 0112 15c2.485 0 4.769.83 6.879 2.217M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="hidden sm:inline">Entrar</span>
+          </a>
+        `;
       }
-      localStorage.setItem("carrinho", JSON.stringify(carrinho));
-      renderizarCarrinho();
-    }
+    });
 
-    // Remove item com animação
-    function removerItemComAnimacao(index) {
-      const divItem = document.getElementById(item-${index});
-      if (!divItem) return;
+    document.getElementById("menuToggle")?.addEventListener("click", () => {
+      const menuMobile = document.getElementById("menuMobile");
+      menuMobile.classList.toggle("hidden");
+    });
 
-      divItem.classList.add("opacity-0", "-translate-x-4");
-
-      setTimeout(() => {
-        carrinho.splice(index, 1);
-        localStorage.setItem("carrinho", JSON.stringify(carrinho));
-        renderizarCarrinho();
-      }, 400);
-    }
-
-    // Inicializa a renderização ao carregar a página
-    renderizarCarrinho();
   </script>
 
 </body>
